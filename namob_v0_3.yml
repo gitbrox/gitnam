@@ -1,0 +1,95 @@
+openapi: '3.0.3'
+info:
+  title: API Title
+  version: '1.0'
+servers:
+  - url: https://api.server.test/v1
+paths:
+  /banking/accounts:
+    GET:
+      description:
+        Obtain a list of accounts
+      OperationId: List Accounts
+      parameters:
+      responses:
+        "200"
+          content:
+             application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseBankingAccount'
+          description: Success
+components:
+  schemas: 
+    responseBankingAccount:
+      example:
+        data:
+          bankingAccount: 
+          - accountId: 12345678910
+            accountIsOwned: Y
+            accountHolderName: Malcom X
+            accountType: CURRENT
+            accountCurrency: NAD
+            accountDisplayName: Super Saver
+            accountInstitutionBranch: 282672
+          - accountId: 12345678910
+            accountIsOwned: Y
+            accountHolderName: Malcom X
+            accountType: CURRENT
+            accountCurrency: NAD
+            accountDisplayName: Super Saver
+            accountInstitutionBranch: 282672
+          - accountId: 12345678910
+            accountIsOwned: Y
+            accountHolderName: Malcom X
+            accountType: CURRENT
+            accountCurrency: NAD
+            accountDisplayName: Super Saver
+            accountInstitutionBranch: 282672
+        Meta:
+            totalRecords: 3
+            totalPages: 1
+        links:
+            next: next
+            last: last
+            prev: prev
+            self: self
+            first: first
+      properties:
+        data:
+          $ref: '#/components/schemas/bankingAccount'
+        links:
+          $ref: '#/components/schemas/linksObject'
+        meta:
+          $ref: '#/components/schemas/MetaObject'
+      required:
+        - data
+        - links
+        - meta  
+      type: object
+    bankingAccount:
+      properties:
+        accountId:
+          type: string
+          pattern: '16x'
+        accountIsOwned:
+          description: Flag indicating that the Account Holder who has given consent for the API,  is an owner of the account. Does not indicate sole ownership, however. If not present then 'true' is assumed: 
+          type: boolean: 
+        accountHolderName: 
+          description: The name of the Account Holder: 
+          type: string: 
+        accountType: 
+          description: The type of account. Savings account, Current, Wallet, Loan account: 
+          type: string: 
+          pattern: '20x': 
+        accountCurrency: 
+          description: The currency of the account: 
+          enum: 
+          - NA 
+        accountDisplayName: 
+          description: The display name of the account as defined by the bank and shown to the Account Holder.: 
+          type: string: 
+        accountInstitutionBranch: 
+          description: The branch where the Account is held: 
+          type: number: 
+          pattern: '6n': 
+      type: object

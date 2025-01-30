@@ -1,0 +1,164 @@
+openapi: 3.1.0
+info:
+  title: Namibian Open Banking API  AIS and PIS
+  version: 0.3
+  description:
+    # Summary
+    This file contains draft Namibian Open Banking APIs
+    This version contains minimal security elements.
+  license:
+    name: Copywrite Bank of Namibia 2025
+    url: https://opensource.org/licenses/MIT
+  contact:
+    name: John Broxis
+    email: api@johnbroxis.com
+  externalDocs:
+    url: https://www.example.com  
+servers:
+  - url: https://api.tbc.com
+    description: Production
+  - url: https://api-sandbox.tbc.com
+    description: Sandbox
+security:
+  - mTLS: []
+  - OAuth2: []
+tags:
+  - name: Sectors
+    description: Sectors define the industry to which the API Is allowed to exchange Data, e.g. transport, banking, insurance, healthcare.
+    * Banking: For APIs related to banking and potentially wider financial services data.
+    * Common: Services. For APIs that potentially span sectors or services, e.g. consent endpoints, reporting endpoints.
+  - name: Services
+      description: Services define the type of data that can be exchanged.
+    * Consent: The supported endpoints and their versions that are used for consent. 
+    * Payment Initiation (PIS): The supported endpoints and their versions that are used for Payment Initiation Services 
+    * Account Information (AIS): The supported endpoints and their versions that are used for Account Information Services
+  - name: OperationTypes.
+      description: Operation types define the type of operation that can be performed on the API.
+        * AIS.Read: Account information will be limited to reading (not updating) information in the first phase.
+        * PIS.Write: Payments can be created by Account Holders through TPPs.
+        * PIS.Read: Payment statuses information can be read by TPPs for payments they have made, support account holders.
+  - name: Resource Objects
+      description: Represent the object used in the End Point's Resource.
+        * Accounts: Information about an account, such as identifier, account holder name, type.
+        * Balances: Balances of an account, typically a type, an amount and a currency. There may multiple balance types.
+        * Transactions: Key information relating to a specific account. Transactions information includes identifiers, dates, amounts, currency, status.
+        * Payments: Payments or movements on the account made from a payer to a payee, including interest payments, fees and internal transfers.
+        * Payment Status: The status of a payment that has been made.
+        * Beneficiaries: Beneficiaries (Payees) that have been added by Account Holders and organisations or individuals Account Holders pay frequently.
+        banking:accounts.basic.read	Ability to read account infromation
+  - name: scopes
+      description:
+      Scopes define the permissions that can be granted to a client application.
+        * banking:payments.write	Ability to initate a payment
+        * banking:payments.read	Ability to read the status of a payment request
+        * consent:authorisationcode.write	Ability to send an authorisation code
+        * consent:authorisationtoken.write	Ability to send an access token
+    -name: API Use Case
+      description:
+    API Use Cases define the use cases for the API
+    * List Accounts:	Obtain a list of accounts	"The List Accounts API allows a third party to obtain a list of accounts at the request of an Account Holder. 
+        A list of accounts will be returned and should reflect the list of accounts that the same Account Holder would see if they accessed their account through a mobile app or web browser.
+        Query parameters allow the list of accounts returned to be filtered by ""open"" and ""closed"" status and by accountType."
+    * Get Account Balance:	Obtain the balance for a single specified account 	"The Get Account Balance API allows a third party to obtain the balance for a specific account on the request of an Account Holder. 
+        The request returns the current balance, but also returns other balances, such as the available balance and credit limits, if appropriate. "
+        * List Transactions:	Obtain transactions for a specific account.
+        The List Transactions API allows a third party to obtain a list of transactions for a specific account on the request of an Account Holder.
+        Query parameters allow the list of accounts returned to be filtered by ""open"" and ""closed"" status and by accountType.
+        Each transaction contains information such as type, status, description,  date, amount, currency reference. 
+        * Make Payment:	Make a bank payment	
+        The Make Payment API allows a third party to initiate a payment on the request of a customer.  A positive API response code indicates whether the payment initiation has been successful or not, i.e., whether the financial institution has successfully accepted the payment instruction, not whether the payment itself is credited correctly.  The API returns a PaymentId, which is then used to track the progress of the payment itself.  Multiple “Make Payment” endpoints may be needed if there are multiple Payment types. 
+        * Get Payment Status:	Get the status of a payment
+        The Get Payment Status API allows a third party to track a payment that they previously initiated, on the request of a customer.  The PaymentId is used as the reference for the payment, as well as to track the progress of the payment itself. 
+        * List Beneficiaries:	Obtain the list of Beneficiaries	
+        The Get Beneficiaries API allows a third party to get the list of Beneficiaries (Payees) that have been added by Account Holders and organisations or individuals they pay frequently. This allows the TPP to present the list of Beneficiaries to the Account Holder when the Account Holder is making a payment.
+paths:
+  /banking/accounts:
+    GET:
+      description:
+        Obtain a list of accounts
+      OperationId: List Accounts
+      parameters:
+      responses:
+        "200"
+          content:
+             application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseBankingAccount'
+          description: Success
+components:
+  schemas: 
+    responseBankingAccount:
+      example:
+        data:
+          bankingAccount: 
+          - accountId: 12345678910
+            accountIsOwned: Y
+            accountHolderName: Malcom X
+            accountType: CURRENT
+            accountCurrency: NAD
+            accountDisplayName: Super Saver
+            accountInstitutionBranch: 282672
+          - accountId: 12345678910
+            accountIsOwned: Y
+            accountHolderName: Malcom X
+            accountType: CURRENT
+            accountCurrency: NAD
+            accountDisplayName: Super Saver
+            accountInstitutionBranch: 282672
+          - accountId: 12345678910
+            accountIsOwned: Y
+            accountHolderName: Malcom X
+            accountType: CURRENT
+            accountCurrency: NAD
+            accountDisplayName: Super Saver
+            accountInstitutionBranch: 282672
+        Meta:
+            totalRecords: 3
+            totalPages: 1
+        links:
+            next: next
+            last: last
+            prev: prev
+            self: self
+            first: first
+      properties:
+        data:
+          $ref: '#/components/schemas/bankingAccount'
+        links:
+          $ref: '#/components/schemas/linksObject'
+        meta:
+          $ref: '#/components/schemas/MetaObject'
+      required:
+        - data
+        - links
+        - meta  
+      type: object
+    bankingAccount:
+      properties:
+        accountId:
+          type: string
+          pattern: '16x'
+        accountIsOwned:
+          description: Flag indicating that the Account Holder who has given consent for the API,  is an owner of the account. Does not indicate sole ownership, however. If not present then 'true' is assumed: 
+          type: boolean: 
+        accountHolderName: 
+          description: The name of the Account Holder: 
+          type: string: 
+        accountType: 
+          description: The type of account. Savings account, Current, Wallet, Loan account: 
+          type: string: 
+          pattern: '20x': 
+        accountCurrency: 
+          description: The currency of the account: 
+          enum: 
+          - NA 
+        accountDisplayName: 
+          description: The display name of the account as defined by the bank and shown to the Account Holder.: 
+          type: string: 
+        accountInstitutionBranch: 
+          description: The branch where the Account is held: 
+          type: number: 
+          pattern: '6n': 
+      type: object
+
+
