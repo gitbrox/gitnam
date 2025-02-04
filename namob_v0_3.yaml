@@ -2,10 +2,81 @@ openapi: 3.0.3
 info:
   title: Namibian Open Banking API  AIS and PIS
   version: "0.3"
-  description:
-    # Summary
-    This file contains draft Namibian Open Banking APIs
-    This version contains minimal security elements.
+  description: |
+    ## Introduction
+    This file contains draft Namibian Open Banking APIs. It is provided to help understanding and
+    is not certified for use in a live environment.
+
+    ### Limitations
+    This version contains minimal security elements and HTTP headers.
+
+    ## Tags used
+    ### Sectors
+    Sectors define the industry to which the API Is allowed to exchange Data, e.g. transport, banking, insurance, healthcare.
+      - Banking 
+      For APIs related to banking and potentially wider financial services data.
+      - Common Services. 
+      For APIs that potentially span sectors or services, e.g. consent endpoints, reporting endpoints.
+
+    ### Services
+    Services define the type of data that can be exchanged.
+      - Consent The supported endpoints and their versions that are used for consent. 
+      - Payment Initiation (PIS) The supported endpoints and their versions that are used for Payment Initiation Services 
+      - Account Information (AIS) The supported endpoints and their versions that are used for Account Information Services
+
+    ### OperationTypes
+    Operation types define the type of operation that can be performed on the API.
+      - AIS.Read Account information will be limited to reading (not updating) information in the first phase.
+      - PIS.Write Payments can be created by Account Holders through TPPs.
+      - PIS.Read Payment statuses information can be read by TPPs for payments they have made, support account holders.
+
+    ### Resource Objects
+    Represent the object used in the End Point's Resource.
+      - Accounts Information about an account, such as identifier, account holder name, type.
+      - Balances Balances of an account, typically a type, an amount and a currency. There may multiple balance types.
+      - Transactions Key information relating to a specific account. Transactions information includes identifiers, dates, amounts, currency, status.
+      - Payments Payments or movements on the account made from a payer to a payee, including interest payments, fees and internal transfers.
+      - Payment Status The status of a payment that has been made.
+      - Beneficiaries Beneficiaries (Payees) that have been added by Account Holders and organisations or individuals Account Holders pay frequently.
+
+    ### scopes
+    Scopes define the permissions that can be granted to a client application.
+      - bankingaccounts.basic.read	Ability to read account infromation
+      - bankingpayments.write Ability to initiate a payment
+      - bankingpayments.read Ability to read the status of a payment request
+      - consentauthorisationcode.write Ability to send an authorisation code
+      - consentaccesstoken.write Ability to send an access token
+
+    ### APIUseCase
+    The API Use Case defines the functionality of each API.
+      ### List Accounts	
+      Obtain a list of accounts	
+      
+      The List Accounts API allows a third party to obtain a list of accounts at the request of an Account Holder. 
+      A list of accounts will be returned and should reflect the list of accounts that the same Account Holder would see if they accessed their account through a mobile app or web browser.
+      ### Get Account Balance	
+      Obtain the balance for a single specified account
+      
+      The Get Account Balance API allows a third party to obtain the balance for a specific account on the request of an Account Holder. 
+      The request returns the current balance, but also returns other balances, such as the available balance and credit limits, if appropriate. 
+      ### List Transactions	
+      Obtain transactions for a specific account.
+      
+      The List Transactions API allows a third party to obtain a list of transactions for a specific account on the request of an Account Holder.
+      Query parameters allow the list of accounts returned to be filtered by "open" and "closed" status and by accountType.
+      Each transaction contains information such as type, status, description,  date, amount, currency reference.
+      ### Make Payment	
+      Make a bank payment	
+      
+      The Make Payment API allows a third party to initiate a payment on the request of a customer. A positive API response code indicates whether the payment initiation has been successful or not, i.e., whether the financial institution has successfully accepted the payment instruction, not whether the payment itself is credited correctly.  The API returns a PaymentId, which is then used to track the progress of the payment itself.  Multiple “Make Payment” endpoints may be needed if there are multiple Payment types. 
+      ### Get Payment Status	
+      Get the status of a payment
+
+      The Get Payment Status API allows a third party to track a payment that they previously initiated, on the request of a customer.  The PaymentId is used as the reference for the payment, as well as to track the progress of the payment itself. 
+      ### List Beneficiaries
+      Obtain the list of Beneficiaries
+
+      The Get Beneficiaries API allows a third party to get the list of Beneficiaries (Payees) that have been added by Account Holders and organisations or individuals they pay frequently. This allows the TPP to present the list of Beneficiaries to the Account Holder when the Account Holder is making a
   license:
     name: Copywrite Bank of Namibia 2025
     url: https://opensource.org/licenses/MIT
@@ -21,56 +92,55 @@ security:
   - mTLS: []
   - OAuth2: []
 tags:
-  - name: Sectors
-    description: Sectors define the industry to which the API Is allowed to exchange Data, e.g. transport, banking, insurance, healthcare.
-      Banking For APIs related to banking and potentially wider financial services data.
-      Common Services. For APIs that potentially span sectors or services, e.g. consent endpoints, reporting endpoints.
-  - name: Services
-    description: Services define the type of data that can be exchanged.
-      Consent The supported endpoints and their versions that are used for consent. 
-      Payment Initiation (PIS) The supported endpoints and their versions that are used for Payment Initiation Services 
-      Account Information (AIS) The supported endpoints and their versions that are used for Account Information Services
-  - name: OperationTypes.
-    description: Operation types define the type of operation that can be performed on the API.
-      AIS.Read Account information will be limited to reading (not updating) information in the first phase.
-      PIS.Write Payments can be created by Account Holders through TPPs.
-      PIS.Read Payment statuses information can be read by TPPs for payments they have made, support account holders.
-  - name: Resource Objects
-    description: Represent the object used in the End Point's Resource.
-      Accounts Information about an account, such as identifier, account holder name, type.
-      Balances Balances of an account, typically a type, an amount and a currency. There may multiple balance types.
-      Transactions Key information relating to a specific account. Transactions information includes identifiers, dates, amounts, currency, status.
-      Payments Payments or movements on the account made from a payer to a payee, including interest payments, fees and internal transfers.
-      Payment Status The status of a payment that has been made.
-      Beneficiaries Beneficiaries (Payees) that have been added by Account Holders and organisations or individuals Account Holders pay frequently.
-      bankingaccounts.basic.read	Ability to read account infromation
-  - name: scopes
-    description: Scopes define the permissions that can be granted to a client application.
-      bankingpayments.write Ability to initiate a payment
-      bankingpayments.read Ability to read the status of a payment request
-      consentauthorisationcode.write Ability to send an authorisation code
-      consentaccesstoken.write Ability to send an access token
+  - name: Banking
+    description: For APIs related to banking and potentially wider financial services data.
+  - name: Common Services
+    description: For APIs that potentially span sectors or services, e.g. consent endpoints, reporting endpoints.
+  - name: ais.read
+  - name: pis.write
+  - name: pis.read
+  - name: Acounts
+    description: Information about an account, such as identifier, account holder name, type.
+  - name: Balances 
+    description: Balances of an account, typically a type, an amount and a currency. There may multiple balance types.
+  - name: Transactions
+    description: Key information relating to a specific account. Transactions information includes identifiers, dates, amounts, currency, status.
+  - name: Payments
+    description: Payments or movements on the account made from a payer to a payee, including interest payments, fees and internal transfers.
+  - name: Payment Status
+    description: The status of a payment that has been made.
+  - name: Beneficiaries
+    description: Beneficiaries (Payees) that have been added by Account Holders and organisations or individuals Account Holders pay frequently.
+  - name: bankingaccounts.basic.read
+    description: Ability to read account information.
+  - name: bankingpayments.write
+    description: Ability to initiate a payment
+  - name: bankingpayments.read
+    description: Ability to read the status of a payment request
+  - name: consentauthorisationcode.write
+    description: Ability to send an authorisation code
+  - name: consentaccesstoken.write 
+    description: Ability to send an access token
   - name: APIUseCase
-    description: API Use Cases define the use cases for the API.
-      List Accounts	Obtain a list of accounts	"The List Accounts API allows a third party to obtain a list of accounts at the request of an Account Holder. 
-      A list of accounts will be returned and should reflect the list of accounts that the same Account Holder would see if they accessed their account through a mobile app or web browser.
-      Query parameters allow the list of accounts returned to be filtered by ""open"" and ""closed"" status and by accountType."
-      Get Account Balance	Obtain the balance for a single specified account 	"The Get Account Balance API allows a third party to obtain the balance for a specific account on the request of an Account Holder. 
-      The request returns the current balance, but also returns other balances, such as the available balance and credit limits, if appropriate. "
-      List Transactions	Obtain transactions for a specific account.
-      The List Transactions API allows a third party to obtain a list of transactions for a specific account on the request of an Account Holder.
-      Query parameters allow the list of accounts returned to be filtered by ""open"" and ""closed"" status and by accountType.
-      Each transaction contains information such as type, status, description,  date, amount, currency reference. 
-      Make Payment	Make a bank payment	
-      The Make Payment API allows a third party to initiate a payment on the request of a customer.  A positive API response code indicates whether the payment initiation has been successful or not, i.e., whether the financial institution has successfully accepted the payment instruction, not whether the payment itself is credited correctly.  The API returns a PaymentId, which is then used to track the progress of the payment itself.  Multiple “Make Payment” endpoints may be needed if there are multiple Payment types. 
-      Get Payment Status	Get the status of a payment
-      The Get Payment Status API allows a third party to track a payment that they previously initiated, on the request of a customer.  The PaymentId is used as the reference for the payment, as well as to track the progress of the payment itself. 
-      List Beneficiaries	Obtain the list of Beneficiaries	
-      The Get Beneficiaries API allows a third party to get the list of Beneficiaries (Payees) that have been added by Account Holders and organisations or individuals they pay frequently. This allows the TPP to present the list of Beneficiaries to the Account Holder when the Account Holder is making a payment.
+  - name: List Accounts
+    description: Obtain a list of accounts.
+  - name: Get Account Balance
+    description: Obtain the balance for a single specified account
+  - name: List Transactions
+    description: Obtain transactions for a specific account.
+  - name: Make Payment
+    description: Make a bank payment
+  - name: Get Payment Status
+    description: Get the status of a payment
+  - name: List Beneficiaries
+    description: Obtain the list of Beneficiaries
 paths:
   /banking/accounts:
     get:
-      description: Obtain a list of accounts
+      description:  The List Accounts API allows a third party to obtain a list of accounts 
+                    at the request of an Account Holder. The list of accounts returned
+                    should match the list of accounts that the same Account Holder would see 
+                    if they accessed their account through a mobile app or web browser.
       operationId: ListAccounts
       parameters: []
       responses: 
@@ -104,8 +174,100 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseErrors'
-
-
+      summary: Obtain a list of accounts
+      tags: 
+        - Banking
+        - Accounts
+        - List Accounts
+  /banking/accounts/{accountId}/balances:
+    get:
+      description: |
+        The Get Account Balance API allows a third party to obtain the balance for a specific account on
+        the request of an Account Holder. The request returns the current balance, but also returns 
+        other balances, such as the available balance and credit limits, if appropriate.
+      operationId: GetAccountBalance
+      parameters: [] 
+      responses: 
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseBankingBalance'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseErrors'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseErrors'
+        '406':
+          description: Not Acceptable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseErrors'
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseErrors'
+      summary: Obtain the balance for a single specified account
+      tags: 
+      - Banking
+      - Balances
+      - Get Account Balance
+  /banking/accounts/{accountId}/transactions:
+    get:
+      description: |
+        The List Transactions API allows a third party to obtain a list of transactions for a specific
+        account on the request of an Account Holder. The Query parameters allow the list of accounts 
+        returned to be filtered by ""open"" and ""closed"" status and by accountType. 
+        Each transaction contains information such as type, status, description,  date, amount, currency reference. 
+      operationId: ListTransactions
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseBankingTransaction'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseErrors'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseErrors'
+        '406':
+          description: Not Acceptable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseErrors'
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseErrors'
+      summary: Obtain transactions for a specific account.
+      tags: 
+      - Banking
+      - Transactions
+      - List Transactions
 components:
   schemas:
     Meta:
@@ -282,6 +444,171 @@ components:
       - accountCurrency
       - accountDisplayName
       type: object
+    ResponseBankingBalance:
+      example:
+        data:
+          balances:
+          - accountId: 12345678910
+            accountBalanceType: AVAILABLE
+            accountBalanceCurrency: NAD
+            accountBalanceAmount: 99628
+          - accountId: 12345678910
+            accountBalanceType: Current
+            accountBalanceCurrency: NAD
+            accountBalanceAmount: 100000
+        links:
+          next: next
+          last: last
+          prev: prev
+          self: self
+          first: first
+        meta:
+          totalRecords: 1
+          totalPages: 1 
+      properties:
+        data:
+          $ref: '#/components/schemas/ResponseBankingBalance_data'
+        links:
+          $ref: '#/components/schemas/LinksPaginated'
+        meta:
+          $ref: '#/components/schemas/MetaPaginated'
+      required:
+      - data
+      type: object
+    ResponseBankingBalance_data:
+      example:
+        BankingBalance:
+        - accountId: 12345678910
+          accountBalanceType: AVAILABLE
+          accountBalanceCurrency: NAD
+          accountBalanceAmount: 99628
+        - accountId: 12345678910
+          accountBalanceType: Current
+          accountBalanceCurrency: NAD
+          accountBalanceAmount: 100000
+      properties:
+        balances:
+          items:
+            $ref: '#/components/schemas/bankingBalance'
+          type: array
+      required: 
+      - balances
+      type: object
+    bankingBalance:
+      example:
+        accountId: 12345678910
+        accountBalanceType: AVAILABLE
+        accountBalanceCurrency: NAD
+        accountBalanceAmount: 99628
+      properties:
+        accountId: 
+          description: The ID of the account (i.e. the Account Number)that the customer would see on a statement or other documentation. This is may be 9 digit phone number, the 11 digit account number, or a 16 digit card number.
+          type: string
+          pattern: "16x"
+        accountBalanceType: 
+          description: The type of balance being shown
+          enum:
+          - AVAILABLE
+          - CURRENT
+          - OUTSTANDING
+          - POCKET
+        accountBalanceCurrency: 
+          description: Currency of the amount held in the account
+          enum:
+          - NAD
+        accountBalanceAmount: 
+          description: The amount of the balance. Currency value format MUST have two decimal places. The last two digits of the number shall be the decimal digits
+          type: integer
+      required:
+      - accountId
+      - accountBalanceType
+      - accountBalanceCurrency
+      - accountBalanceAmount
+      type: object
+    ResponseBankingTransaction:
+      properties:
+        data:
+          $ref: '#/components/schemas/ResponseBankingTransaction_data'
+        links:
+          $ref: '#/components/schemas/LinksPaginated'
+        meta:
+          $ref: '#/components/schemas/MetaPaginated'
+      required:
+      - data
+      type: object
+    ResponseBankingTransaction_data:
+      properties:
+        transactions:
+          items:
+            $ref: '#/components/schemas/bankingTransaction'
+          type: array
+      required:
+      - transactions
+      type: object
+    bankingTransaction:
+      example:
+        accountId: 12345678910
+        transactionAmount: 1000
+        transactionCurrency: NAD
+        transactionAuthorisationDate: 2025-01-01T00:00:00Z
+        transactionBookingDate: 2025-01-01T00:00:00Z
+        transactionCreditDate: 2025-01-01T00:00:00Z
+        transactionId: 12345678910
+        transactionReference1: "Payment ref: 12345"
+        transactionReference2: "Invoice ref: 12345"
+        transactionReference3: 12345678910
+        transactionStatus: COMPLETED
+        transactionType: PAYM 
+        properties:
+          accountId:
+            description: The ID of the account (i.e. the Account Number)that the customer would see on a statement or other documentation. This is may be 9 digit phone number, the 11 digit account number, or a 16 digit card number.
+            type: string
+            pattern: "16x"
+          transactionAmount:
+            description: Total amount of the transaction. Currency value format MUST have two decimal places. The last two digits of the number shall be the decimal digits."
+            type: integer
+          transactionCurrency:
+            description: Currency of the amount held in the account
+            enum:
+            - NAD
+          transactionAuthorisationDate: 
+            description: The date the Account Holder made the payment instruction
+            type: date
+          transactionBookingDate: 
+            description: The date (day) when the transaction was accepted for processing (e.g. a payment made at 6pm (Authorisation date 01/01/2025) may be processed the next working day (02/01/2025)
+            type: date
+          transactionCreditDate: 
+            description: The date the payment was credited to the account
+            type: date
+          transactionId: 
+            description: Alphanumeric code identifying the transaction, probably only recognised by the Account Holding institution.
+            type: string
+            pattern: STRING
+          transactionReference1: 
+            description: Alphanumeric code identifying the transaction reference, as recognised by the Account Holder. Recommended that any reference from the Payer go here, if available.
+            type: string
+          transactionReference2: 
+            description: Alphanumeric code identifying the transaction reference, as recognised by the Account Holder. Recommended that any reference from the Payee go here, if available.
+            type: string
+          transactionReference3: 
+            description: A free text block for other information. Recommended that the TransactionID be put here, if it is intended the Account Holder sees the TransactionID.
+            type: string
+          transactionStatus: 
+            description: Shows the current status of the transaction. Data Providers to create their own codelists.
+            type: string
+          transactionType: 
+            description: A code to help the Account Holder Identify the type of operation. Data Providers to provide their own code lists.
+            enum: 
+            - PAYM
+        required: 
+        - accountId
+        - transactionAmount
+        - transactionCurrency
+        - transactionBookingDate
+        - transactionId
+        - transactionReference1
+        - transactionStatus
+        type: object    
     ResponseErrors:
       properties:
         errors:
