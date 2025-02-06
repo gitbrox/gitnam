@@ -186,7 +186,16 @@ paths:
         the request of an Account Holder. The request returns the current balance, but also returns 
         other balances, such as the available balance and credit limits, if appropriate.
       operationId: GetAccountBalance
-      parameters: [] 
+      parameters:
+      - description: ID of the specific account requested
+        explode: false
+        in: path
+        name: accountId
+        required: true
+        schema:
+          type: string
+          pattern: '16x'
+        style: simple
       responses: 
         '200':
           description: OK
@@ -231,7 +240,16 @@ paths:
         returned to be filtered by ""open"" and ""closed"" status and by accountType. 
         Each transaction contains information such as type, status, description,  date, amount, currency reference. 
       operationId: ListTransactions
-      parameters: []
+      parameters:
+      - description: ID of the specific account requested
+        explode: false
+        in: path
+        name: accountId
+        required: true
+        schema:
+          type: string
+          pattern: '16x'
+        style: simple
       responses:
         '200':
           description: OK

@@ -1,0 +1,21 @@
+### List Accounts
+GET https://d85a655e-9dbc-4c2f-8bbc-888f1e9bb53c.mock.pstmn.io/banking/accounts
+Content-Type: application/json
+Authorization: Bearer <your-token>
+
+### Get Account Balance
+GET https://api.example.com/banking/accounts/12345678910/balance
+Content-Type: application/json
+Authorization: Bearer <your-token>
+
+### Make Payment
+POST https://api.example.com/banking/payments
+Content-Type: application/json
+Authorization: Bearer <your-token>
+
+{
+  "accountId": "12345678910",
+  "amount": 100.00,
+  "currency": "NAD",
+  "payee": "John Doe"
+}
